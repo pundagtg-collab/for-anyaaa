@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maaf Anyaa</title>
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at top, #fff0f6, #ffd6e8, #ffc2dc);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* TEXT */
+.message {
+    font-size: clamp(22px, 6vw, 34px);
+    font-weight: 600;
+    color: #444;
+    max-width: 90%;
+    line-height: 1.8;
+    min-height: 200px;
+    white-space: pre-line;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+/* BUTTON */
+.button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 30px;
+    background: #ff69b4;
+    color: white;
+    cursor: pointer;
+    transition: 0.4s;
+}
+.button:hover { transform: scale(1.1); }
+
+/* FOTO di kiri atas */
+img {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 25vw;
+    transform: rotate(-10deg);
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    display: none;
+    z-index: 5;
+    animation: swing 3s ease-in-out infinite;
+}
+
+/* Animasi goyang foto */
+@keyframes swing {
+    0% { transform: rotate(-12deg); }
+    50% { transform: rotate(-8deg); }
+    100% { transform: rotate(-12deg); }
+}
+
+/* BUNGA */
+.lily { position: absolute; width: 0; height: 0; animation: sway-lily 2s ease-in-out infinite alternate; z-index: 1; }
+.lily .stem { position: absolute; width: 6px; height: 120px; background: linear-gradient(to top, #228B22, #32CD32); left: -3px; bottom: 0; border-radius: 3px; }
+.lily .leaf { position: absolute; width: 50px; height: 20px; background: linear-gradient(to right, #32CD32, #228B22); border-radius: 50% 50% 0 0; bottom: 60px; }
+.lily .leaf.left { left: -45px; transform: rotate(-30deg); }
+.lily .leaf.right { left: -5px; transform: rotate(30deg); }
+.lily .petal { position: absolute; width: 40px; height: 80px; background: linear-gradient(to top, #fff, #f0f0f0); border-radius: 50% 50% 0 0; bottom: 120px; left: -20px; transform-origin: bottom center; }
+.lily .petal:nth-child(1) { transform: rotate(0deg) translateY(-20px);}
+.lily .petal:nth-child(2) { transform: rotate(60deg) translateY(-20px);}
+.lily .petal:nth-child(3) { transform: rotate(120deg) translateY(-20px);}
+.lily .petal:nth-child(4) { transform: rotate(180deg) translateY(-20px);}
+.lily .petal:nth-child(5) { transform: rotate(240deg) translateY(-20px);}
+.lily .petal:nth-child(6) { transform: rotate(300deg) translateY(-20px);}
+@keyframes sway-lily { 0% { transform: translateX(0px) rotate(-5deg);} 50% { transform: translateX(3px) rotate(5deg);} 100% { transform: translateX(0px) rotate(-5deg);} }
+
+/* CINCIN PUTIH JATUH */
+.falling-ring { position: fixed; width: 25px; height: 25px; border: 3px solid white; border-radius: 50%; top: -40px; box-shadow: 0 0 8px white; animation: fall linear forwards; pointer-events: none; }
+@keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+</style>
+</head>
+<body>
+
+<audio id="bgm" src="assets/lagu.mp3" loop></audio>
+
+<div class="message" id="typing"></div>
+<button class="button" id="btn">tekaan disiniii</button>
+<img id="photo">
+
+<script>
+let messages = [
+"anyaa baaikkkk dan paling cantikkkk 💖",
+"maaf yaaa kemareen akuu benerann lupaa buat pakeee cincinnyaaaa, beneran gak adaa alasan lainn akuu lepasin kemarennn😔",
+"maaf yaa udah buat anyaa kecewaa, padahall akuu duluan yang permasalahin ini kemaren daan buat janjii lagiii. maaf yaaa....🥺",
+"anyaaaaa..... pakeee lagii yaaa cincinnyaa pllliiiiiiissssss💍",
+"janjii mulai harii ini  gak akaan akuu lepas lagiii cincinnyaaa 🤍",
+"sebagai permintaan maaf inii bungaa untuk anyaa (maaf jelekk bunganyaa) 🌸",
+"pliiiisss pakee lagii yaa cincinnaa yaaaa, mulai hari inii anyaaa gak akan ngelihat akuu lepasiin cincinnyaa lagiii. 💞"
+];
+
+let photos = [
+"assets/foto1.jpg","assets/foto2.jpg","assets/foto3.jpg","assets/foto4.jpg",
+"assets/foto5.jpg","assets/foto6.jpg","assets/foto7.jpg"
+];
+
+let current = 0;
+let container = document.getElementById("typing");
+let photo = document.getElementById("photo");
+let audio = document.getElementById("bgm");
+let lilyAdded = false;
+
+// Ketik per huruf
+function typeLine(text, callback){
+    container.innerHTML = ""; 
+    let i = 0;
+    function typeChar(){
+        if(i < text.length){
+            container.innerHTML += text[i]; 
+            i++;
+            setTimeout(typeChar, 35);
+        } else { 
+            if(callback) callback(); 
+        }
+    }
+    typeChar();
+}
+
+// Buat bunga lily
+function createLilies(count=5){
+    for(let i=0;i<count;i++){
+        let lily=document.createElement("div");
+        lily.className="lily";
+        lily.style.left=(10 + Math.random()*80)+"vw";
+        lily.style.top=(50 + Math.random()*40)+"vh";
+        for(let k=0;k<6;k++){ let p=document.createElement("div"); p.className="petal"; lily.appendChild(p); }
+        let s=document.createElement("div"); s.className="stem"; lily.appendChild(s);
+        let dl=document.createElement("div"); dl.className="leaf left"; lily.appendChild(dl);
+        let dr=document.createElement("div"); dr.className="leaf right"; lily.appendChild(dr);
+        document.body.appendChild(lily);
+    }
+}
+
+// Cincin putih jatuh
+function createRing() {
+    let ring=document.createElement("div");
+    ring.classList.add("falling-ring");
+    ring.style.left=Math.random()*100+"vw";
+    ring.style.animationDuration=(2+Math.random()*2)+"s";
+    document.body.appendChild(ring);
+    setTimeout(()=>ring.remove(),4000);
+}
+
+let btn=document.getElementById("btn");
+btn.onclick=function(){
+    if(current===0){
+        audio.play();
+        btn.innerHTML="tekan lagi";
+    }
+    if(current<messages.length){
+        typeLine(messages[current],function(){
+            photo.src=photos[current];
+            photo.style.display="block";
+            if(messages[current].includes("bungaa") && !lilyAdded){
+                createLilies(6);
+                lilyAdded=true;
+            }
+            current++; // pindah ke sini
+        });
+    }
+    if(current===messages.length){ btn.innerHTML="💍 klik terakhir yaa 💍"; }
+    for(let i=0;i<10;i++){ setTimeout(createRing, i*150); }
+    if(current>messages.length){ btn.style.display="none"; }
+}
+</script>
+</body>
+</html>
+
+
